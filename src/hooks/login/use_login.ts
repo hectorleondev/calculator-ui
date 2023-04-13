@@ -56,6 +56,7 @@ export const useLogin = () => {
         handleSubmit,
         errorMessage,
         setErrorMessage,
-        setLoading
+        setLoading,
+        token: localStorage.getItem("auth_token")
     }
 }

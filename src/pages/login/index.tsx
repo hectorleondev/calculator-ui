@@ -21,8 +21,8 @@ export const Login = () => {
         loading,
         handleSubmit,
         errorMessage,
+        token
     } = useLogin()
-    const token = localStorage.getItem("auth_token");
 
     return (
         <ThemeProvider theme={theme}>
