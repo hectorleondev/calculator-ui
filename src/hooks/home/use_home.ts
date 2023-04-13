@@ -53,6 +53,8 @@ export const useHome = () => {
 
     type FilterInput = TypeOf<typeof filterSchema>;
 
+    const [openAddDialog, setOpenAddDialog ] = useState(false);
+
     const {
         register,
         formState: { errors, isSubmitSuccessful },
@@ -160,6 +162,14 @@ export const useHome = () => {
         setConditionOperationResponse(event.target.value);
     }, []);
 
+    const handleClickOpenAddDialog = () => {
+        setOpenAddDialog(true);
+    };
+
+    const handleCloseAddDialog = () => {
+        setOpenAddDialog(false);
+    };
+
     return {
         loading,
         errorMessage,
@@ -181,6 +191,9 @@ export const useHome = () => {
         operationType,
         conditionAmount,
         conditionUseBalance,
-        conditionOperationResponse
+        conditionOperationResponse,
+        openAddDialog,
+        handleClickOpenAddDialog,
+        handleCloseAddDialog
     }
 }

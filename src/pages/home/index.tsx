@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
+import {AddDialog} from "./add_dialog";
 
 const theme = createTheme();
 export const Home = () => {
@@ -42,7 +43,10 @@ export const Home = () => {
         operationType,
         conditionAmount,
         conditionUseBalance,
-        conditionOperationResponse
+        conditionOperationResponse,
+        openAddDialog,
+        handleClickOpenAddDialog,
+        handleCloseAddDialog
     } = useHome();
 
     return (
@@ -178,7 +182,10 @@ export const Home = () => {
                                     </Grid>
                                     <Grid container spacing={2} sx={{marginTop: "10px", marginBottom: "10px"}}>
                                         <Grid item xs={6}>
-                                            <Button variant="contained" type="submit" >Apply Filters</Button>
+                                            <Button variant="contained" color="primary" type="submit" >Apply Filters</Button>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Button variant="contained" color="success" onClick={handleClickOpenAddDialog}>New Calculation</Button>
                                         </Grid>
                                     </Grid>
                             </Box>
@@ -220,6 +227,11 @@ export const Home = () => {
                     )}
                 </Box>
             </Container>
+
+            <AddDialog
+                open={openAddDialog}
+                handleClose={handleCloseAddDialog}
+            />
         </ThemeProvider>
     );
 };
