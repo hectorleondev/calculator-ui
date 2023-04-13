@@ -1,9 +1,9 @@
-import {ChangeEvent, FormEvent, useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {SelectChangeEvent} from "@mui/material";
 import CalculationService from "../../api/calculation";
-import {string} from "zod";
 
-export const useAddDialog = (handleClose: ()=>void) => {
+
+export const useAddDialog = (handleClose: ()=>void, onAfterAdd: ()=>void) => {
     const [operationType, setOperationType] = useState('0');
     const [hiddenInputOne, setHiddenInputOne] = useState(false);
     const [hiddenInputTwo, setHiddenInputTwo] = useState(false);
@@ -140,6 +140,7 @@ export const useAddDialog = (handleClose: ()=>void) => {
         CalculationService.save_calculation(token || '', request_form)
             .then((res) => {
                 onClose();
+                onAfterAdd();
             })
             .catch((e: any) => {
                 setErrorMessage(e.response.data.message);

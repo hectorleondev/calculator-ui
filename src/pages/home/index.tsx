@@ -46,7 +46,8 @@ export const Home = () => {
         conditionOperationResponse,
         openAddDialog,
         handleClickOpenAddDialog,
-        handleCloseAddDialog
+        handleCloseAddDialog,
+        onAfterAdd
     } = useHome();
 
     return (
@@ -232,6 +233,7 @@ export const Home = () => {
                 open={openAddDialog}
                 handleClose={handleCloseAddDialog}
                 operations={operationList.operations}
+                onAfterAdd={onAfterAdd}
             />
         </ThemeProvider>
     );

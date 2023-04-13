@@ -18,10 +18,11 @@ import Alert from "@mui/material/Alert";
 interface AddDialogProps{
     open: boolean;
     handleClose: () => void;
-    operations: Operation[]
+    operations: Operation[],
+    onAfterAdd: () => void;
 }
 
-export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
+export const AddDialog = ({open, handleClose, operations, onAfterAdd}:AddDialogProps) => {
     const {
         operationType,
         onChangeOperation,
@@ -37,7 +38,7 @@ export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
         disableButton,
         onAddClick,
         errorMessage
-    } = useAddDialog(handleClose)
+    } = useAddDialog(handleClose, onAfterAdd)
     return (
         <Dialog open={open} onClose={handleClose} fullWidth={true}>
             <DialogTitle>New Calculation</DialogTitle>
@@ -57,7 +58,7 @@ export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
                         >
                             <MenuItem value="0"></MenuItem>
                             {operations.map((item)=> (
-                                <MenuItem value={item.operation_id+";"+item.type}>{item.type}</MenuItem>
+                                <MenuItem value={item.operation_id+";"+item.type}>{item.type} {item.cost}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>

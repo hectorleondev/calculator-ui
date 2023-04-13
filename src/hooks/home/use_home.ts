@@ -101,6 +101,23 @@ export const useHome = () => {
     }, [filters]);
 
 
+    const onAfterAdd = useCallback(() => {
+        setLoading(true);
+        setErrorMessage('');
+        const token: string | null = localStorage.getItem("auth_token")
+        CalculationService.get_calculation_list(token || '', page, filters)
+            .then((response)=>{
+                setCalculationList(response.data);
+            })
+            .catch((e: any) => {
+                setErrorMessage(e.response.data.message);
+            })
+            .finally(()=> {
+                setLoading(false);
+            });
+    }, [filters, page]);
+
+
     const logout =() => {
         localStorage.removeItem("auth_token");
         window.location.href = "/login";
@@ -194,6 +211,7 @@ export const useHome = () => {
         conditionOperationResponse,
         openAddDialog,
         handleClickOpenAddDialog,
-        handleCloseAddDialog
+        handleCloseAddDialog,
+        onAfterAdd
     }
 }
