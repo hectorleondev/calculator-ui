@@ -29,9 +29,10 @@ export const Home = () => {
         logout,
         onChange,
         operationList,
-        onChangeOperation,
-        operationType,
-        onFilterClick
+        onSubmitHandler,
+        register,
+        errors,
+        handleSubmit,
     } = useHome();
 
     return (
@@ -60,98 +61,120 @@ export const Home = () => {
 
                     {!loading && errorMessage === "" && (
                         <>
-                            <Grid container spacing={4}>
-                                <Grid item xs={6}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="demo-simple-select-label">Operation Type</InputLabel>
-                                        <Select
-                                            labelId="operation-type-label"
-                                            id="operation-type-label"
-                                            value={operationType}
-                                            label="Operation Type"
-                                            onChange={onChangeOperation}
-                                        >
-                                            <MenuItem value="">ALL</MenuItem>
-                                            {operationList.operations.map((item)=> (
-                                                <MenuItem value={item.operation_id}>{item.type}</MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="Amount"
-                                        variant="outlined"
-                                    />
-                                    <FormControl>
-                                        <InputLabel id="demo-simple-select-label">Condition</InputLabel>
-                                        <Select
-                                            labelId="condition-label"
-                                            id="condition-label"
-                                            value="eq"
-                                            label="Condition"
-                                        >
-                                            <MenuItem value="eq">EQ</MenuItem>
-                                            <MenuItem value="gt">GT</MenuItem>
-                                            <MenuItem value="ge">GE</MenuItem>
-                                            <MenuItem value="lt">LT</MenuItem>
-                                            <MenuItem value="le">LE</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={4} sx={{marginTop: "10px"}}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="User Balance"
-                                        variant="outlined"
-                                    />
-                                    <FormControl>
-                                        <InputLabel id="demo-simple-select-label">Condition</InputLabel>
-                                        <Select
-                                            labelId="condition-label"
-                                            id="condition-label"
-                                            value="eq"
-                                            label="Condition"
-                                        >
-                                            <MenuItem value="eq">EQ</MenuItem>
-                                            <MenuItem value="gt">GT</MenuItem>
-                                            <MenuItem value="ge">GE</MenuItem>
-                                            <MenuItem value="lt">LT</MenuItem>
-                                            <MenuItem value="le">LE</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        id="outlined-basic"
-                                        label="Operacion Response"
-                                        variant="outlined"
-                                    />
-                                    <FormControl>
-                                        <InputLabel id="demo-simple-select-label">Condition</InputLabel>
-                                        <Select
-                                            labelId="condition-label"
-                                            id="condition-label"
-                                            value="eq"
-                                            label="Condition"
-                                        >
-                                            <MenuItem value="eq">EQ</MenuItem>
-                                            <MenuItem value="startswith">STARTS</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={2} sx={{marginTop: "10px", marginBottom: "10px"}}>
-                                <Grid item xs={6}>
-                                    <Button variant="contained" onClick={onFilterClick}>Apply Filters</Button>
-                                </Grid>
-                            </Grid>
-
+                            <Box
+                                component='form'
+                                noValidate
+                                autoComplete='off'
+                                onSubmit={handleSubmit(onSubmitHandler)}
+                            >
+                                    <Grid container spacing={4}>
+                                        <Grid item xs={6}>
+                                            <FormControl fullWidth>
+                                                <InputLabel id="operation-type-label">Operation Type</InputLabel>
+                                                <Select
+                                                    labelId="operation-type-label"
+                                                    id="operation-type-label"
+                                                    label="Operation Type"
+                                                    defaultValue=""
+                                                    {...register('operation_type')}
+                                                >
+                                                    <MenuItem value="">ALL</MenuItem>
+                                                    {operationList.operations.map((item)=> (
+                                                        <MenuItem value={item.operation_id}>{item.type}</MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                type="number"
+                                                id="outlined-basic"
+                                                label="Amount"
+                                                variant="outlined"
+                                                error={!!errors['amount']}
+                                                helperText={errors['amount'] ? errors['amount'].message : ''}
+                                                {...register('amount', {
+                                                    setValueAs: (v) => v === "" ? undefined : parseInt(v, 10)
+                                                })}
+                                            />
+                                            <FormControl>
+                                                <InputLabel id="demo-simple-select-label">Condition</InputLabel>
+                                                <Select
+                                                    labelId="condition-amount-label"
+                                                    id="condition-amount-label"
+                                                    label="Condition"
+                                                    defaultValue="eq"
+                                                    {...register('condition_amount')}
+                                                >
+                                                    <MenuItem value="eq">Equal</MenuItem>
+                                                    <MenuItem value="gt">Greater</MenuItem>
+                                                    <MenuItem value="ge">Greater Igual</MenuItem>
+                                                    <MenuItem value="lt">Less</MenuItem>
+                                                    <MenuItem value="le">Less Equal</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container spacing={4} sx={{marginTop: "10px"}}>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                type="number"
+                                                id="outlined-basic"
+                                                label="User Balance"
+                                                variant="outlined"
+                                                error={!!errors['user_balance']}
+                                                helperText={errors['user_balance'] ? errors['user_balance'].message : ''}
+                                                {...register('user_balance', {
+                                                    setValueAs: (v) => v === "" ? undefined : parseInt(v, 10)
+                                                })}
+                                            />
+                                            <FormControl>
+                                                <InputLabel id="demo-simple-select-label">Condition</InputLabel>
+                                                <Select
+                                                    labelId="condition-user-balance-label"
+                                                    id="condition-user-balance-label"
+                                                    label="Condition"
+                                                    defaultValue="eq"
+                                                    {...register('condition_user_balance')}
+                                                >
+                                                    <MenuItem value="eq">Equal</MenuItem>
+                                                    <MenuItem value="gt">Greater</MenuItem>
+                                                    <MenuItem value="ge">Greater Igual</MenuItem>
+                                                    <MenuItem value="lt">Less</MenuItem>
+                                                    <MenuItem value="le">Less Equal</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                id="outlined-basic"
+                                                label="Operacion Response"
+                                                variant="outlined"
+                                                error={!!errors['operation_response']}
+                                                helperText={errors['operation_response'] ? errors['operation_response'].message : ''}
+                                                {...register('operation_response')}
+                                            />
+                                            <FormControl>
+                                                <InputLabel id="demo-simple-select-label">Condition</InputLabel>
+                                                <Select
+                                                    labelId="condition-operation-response-label"
+                                                    id="condition-operation-response-label"
+                                                    label="Condition"
+                                                    defaultValue="eq"
+                                                    {...register('condition_operation_response')}
+                                                >
+                                                    <MenuItem value="eq">Equal</MenuItem>
+                                                    <MenuItem value="startswith">Starts With</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container spacing={2} sx={{marginTop: "10px", marginBottom: "10px"}}>
+                                        <Grid item xs={6}>
+                                            <Button variant="contained" type="submit" >Apply Filters</Button>
+                                        </Grid>
+                                    </Grid>
+                            </Box>
                             <TableContainer component={Paper}>
                                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                     <TableHead>

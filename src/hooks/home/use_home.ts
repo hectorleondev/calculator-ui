@@ -1,10 +1,11 @@
 import {useCallback, useEffect, useState} from "react";
-import { useNavigate } from "react-router-dom";
 import CalculationService from "../../api/calculation";
 import OperationService from "../../api/operation";
 import {CalculationList} from "../../api/calculation/types";
 import {OperationList} from "../../api/operation/types";
-import {SelectChangeEvent} from "@mui/material";
+import {object, string, number, TypeOf} from "zod";
+import {SubmitHandler, useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
 
 export const useHome = () => {
     const [loading, setLoading] = useState(false);
@@ -20,10 +21,30 @@ export const useHome = () => {
     const [operationList, setOperationList] = useState<OperationList>({
         operations: []
     })
-    const [operationType, setOperationType] = useState('');
 
     const [page, setPage] = useState(1)
     const [filters, setFilters] = useState("")
+
+    const filterSchema = object({
+        operation_type: string().default(""),
+        condition_amount: string().default("eq"),
+        condition_user_balance: string().default("eq"),
+        condition_operation_response: string().default("eq"),
+        amount: number().optional(),
+        user_balance: number().optional(),
+        operation_response: string(),
+    });
+
+    type FilterInput = TypeOf<typeof filterSchema>;
+
+    const {
+        register,
+        formState: { errors, isSubmitSuccessful },
+        reset,
+        handleSubmit,
+    } = useForm<FilterInput>({
+        resolver: zodResolver(filterSchema),
+    });
 
     useEffect(() => {
         setLoading(true);
@@ -61,11 +82,36 @@ export const useHome = () => {
             });
     }, [filters]);
 
-    const onFilterClick = useCallback(() => {
+
+    const logout =() => {
+        localStorage.removeItem("auth_token");
+        window.location.href = "/login";
+    }
+
+    const onSubmitHandler: SubmitHandler<FilterInput> = (values) => {
         let filters = "";
-        if(operationType !== ""){
-            filters = filters + "operation_id,eq,"+operationType
+        if(values.operation_type !== ""){
+            filters = filters + "operation_id,eq,"+values.operation_type
         }
+        if(values.amount !== undefined){
+            if(filters !== ""){
+                filters = filters + "**"
+            }
+            filters = filters + "amount,"+values.condition_amount+","+values.amount
+        }
+        if(values.user_balance !== undefined){
+            if(filters !== ""){
+                filters = filters + "**"
+            }
+            filters = filters + "user_balance,"+values.condition_user_balance+","+values.user_balance
+        }
+        if(values.operation_response !== ""){
+            if(filters !== ""){
+                filters = filters + "**"
+            }
+            filters = filters + "operation_response,"+values.condition_operation_response+","+values.operation_response
+        }
+        console.log(filters);
         setFilters(filters);
         setLoading(true);
         setErrorMessage('');
@@ -80,16 +126,7 @@ export const useHome = () => {
             .finally(()=> {
                 setLoading(false);
             });
-    }, [page, operationType]);
-
-    const onChangeOperation = useCallback((event: SelectChangeEvent) => {
-        setOperationType(event.target.value);
-    }, []);
-
-    const logout =() => {
-        localStorage.removeItem("auth_token");
-        window.location.href = "/login";
-    }
+    };
 
     return {
         loading,
@@ -99,8 +136,9 @@ export const useHome = () => {
         logout,
         onChange,
         operationList,
-        onChangeOperation,
-        operationType,
-        onFilterClick
+        onSubmitHandler,
+        register,
+        errors,
+        handleSubmit,
     }
 }
