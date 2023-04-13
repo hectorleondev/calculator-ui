@@ -16,4 +16,11 @@ export interface Record {
     operation_type: string
 }
 
+export interface SaveRecord {
+    operation_type: string,
+    operation_response: string,
+    user_balance: number,
+    operation_cost: number
+}
+
 

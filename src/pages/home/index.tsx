@@ -231,6 +231,7 @@ export const Home = () => {
             <AddDialog
                 open={openAddDialog}
                 handleClose={handleCloseAddDialog}
+                operations={operationList.operations}
             />
         </ThemeProvider>
     );
