@@ -14,11 +14,13 @@ export const useHome = () => {
         records: []
     })
 
+    const [page, setPage] = useState(1)
+
     useEffect(() => {
         setLoading(true);
         setErrorMessage('');
         const token: string | null = localStorage.getItem("auth_token")
-        CalculationService.get_calculation_list(token || '', 1)
+        CalculationService.get_calculation_list(token || '', page)
             .then((response)=>{
                 setCalculationList(response.data);
             })
@@ -28,9 +30,10 @@ export const useHome = () => {
             .finally(()=> {
                 setLoading(false);
             });
-    }, []);
+    }, [page]);
 
     const onChange = useCallback((page_selected: number) => {
+        setPage(page_selected);
         setLoading(true);
         setErrorMessage('');
         const token: string | null = localStorage.getItem("auth_token")
