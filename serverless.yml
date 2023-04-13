@@ -1,0 +1,123 @@
+service: calculator-ui
+custom:
+  defaultStage: dev
+  stages:
+    - api
+    - dev
+    - test
+  S3_BUCKET_NAME:
+    Ref: StaticFilesS3Bucket
+  CHECKAPIGW: false
+  scriptable:
+    hooks:
+      before:package:createDeploymentArtifacts:
+        - yarn install
+        - yarn build
+
+package:
+  exclude:
+    - node_modules/**
+    - .serverless/**
+
+plugins:
+  - serverless-scriptable-plugin
+  - serverless-stage-manager
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  stage: ${opt:stage, ${self:custom.defaultStage}}
+  stackTags:
+    "sc:service:name": ${self:service}
+
+resources:
+  Resources:
+    LoggingBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: "true"
+          BlockPublicPolicy: "true"
+          IgnorePublicAcls: "true"
+          RestrictPublicBuckets: "true"
+        AccessControl: LogDeliveryWrite
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: "AES256"
+
+    StaticFilesS3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        Tags:
+          - Key: "sc:security:exceptions"
+            Value: "block_public_access"
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: "false"
+          BlockPublicPolicy: "false"
+          IgnorePublicAcls: "false"
+          RestrictPublicBuckets: "false"
+        LoggingConfiguration:
+          DestinationBucketName:
+            Ref: LoggingBucket
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - "*"
+              AllowedHeaders:
+                - "*"
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+        AccessControl: PublicRead
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: "AES256"
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
+
+    StaticSiteS3BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: StaticFilesS3Bucket
+        PolicyDocument:
+          Statement:
+            - Action:
+                - "s3:ListBucket"
+              Effect: "Deny"
+              Principal: "*"
+              Resource:
+                - "Fn::Join":
+                    - ""
+                    - - "arn:aws:s3:::"
+                      - Ref: StaticFilesS3Bucket
+                      - /*
+                - Fn::GetAtt: [StaticFilesS3Bucket, Arn]
+              Condition:
+                Bool:
+                  aws:SecureTransport:
+                    - "false"
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: "*"
+              Action:
+                - s3:GetObject
+              Resource:
+                Fn::Join:
+                  [
+                    "",
+                    ["arn:aws:s3:::", { "Ref": "StaticFilesS3Bucket" }, "/*"],
+                  ]
+
+  Outputs:
+    StaticFilesS3BucketName:
+      Value:
+        Ref: StaticFilesS3Bucket
