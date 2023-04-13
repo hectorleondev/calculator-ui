@@ -1,7 +1,10 @@
 import {useCallback, useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import CalculationService from "../../api/calculation";
+import OperationService from "../../api/operation";
 import {CalculationList} from "../../api/calculation/types";
+import {OperationList} from "../../api/operation/types";
+import {SelectChangeEvent} from "@mui/material";
 
 export const useHome = () => {
     const [loading, setLoading] = useState(false);
@@ -14,22 +17,31 @@ export const useHome = () => {
         records: []
     })
 
+    const [operationList, setOperationList] = useState<OperationList>({
+        operations: []
+    })
+    const [operationType, setOperationType] = useState('');
+
     const [page, setPage] = useState(1)
+    const [filters, setFilters] = useState("")
 
     useEffect(() => {
         setLoading(true);
         setErrorMessage('');
-        const token: string | null = localStorage.getItem("auth_token")
-        CalculationService.get_calculation_list(token || '', page)
-            .then((response)=>{
+        const load_data = async (current_page: number) => {
+            const token: string | null = localStorage.getItem("auth_token")
+            try {
+                const operations = await OperationService.get_operation_list(token || '')
+                setOperationList(operations.data);
+                const response = await CalculationService.get_calculation_list(token || '', current_page)
                 setCalculationList(response.data);
-            })
-            .catch((e: any) => {
-                setErrorMessage(e.response.data.message);
-            })
-            .finally(()=> {
+            } catch (error: any) {
+                setErrorMessage(error.message);
+            } finally {
                 setLoading(false);
-            });
+            }
+        }
+        load_data(page);
     }, [page]);
 
     const onChange = useCallback((page_selected: number) => {
@@ -37,7 +49,7 @@ export const useHome = () => {
         setLoading(true);
         setErrorMessage('');
         const token: string | null = localStorage.getItem("auth_token")
-        CalculationService.get_calculation_list(token || '', page_selected)
+        CalculationService.get_calculation_list(token || '', page_selected, filters)
             .then((response)=>{
                 setCalculationList(response.data);
             })
@@ -47,6 +59,31 @@ export const useHome = () => {
             .finally(()=> {
                 setLoading(false);
             });
+    }, [filters]);
+
+    const onFilterClick = useCallback(() => {
+        let filters = "";
+        if(operationType !== ""){
+            filters = filters + "operation_id,eq,"+operationType
+        }
+        setFilters(filters);
+        setLoading(true);
+        setErrorMessage('');
+        const token: string | null = localStorage.getItem("auth_token")
+        CalculationService.get_calculation_list(token || '', page, filters)
+            .then((response)=>{
+                setCalculationList(response.data);
+            })
+            .catch((e: any) => {
+                setErrorMessage(e.response.data.message);
+            })
+            .finally(()=> {
+                setLoading(false);
+            });
+    }, [page, operationType]);
+
+    const onChangeOperation = useCallback((event: SelectChangeEvent) => {
+        setOperationType(event.target.value);
     }, []);
 
     const logout =() => {
@@ -60,6 +97,10 @@ export const useHome = () => {
         token: localStorage.getItem("auth_token"),
         calculationList,
         logout,
-        onChange
+        onChange,
+        operationList,
+        onChangeOperation,
+        operationType,
+        onFilterClick
     }
 }

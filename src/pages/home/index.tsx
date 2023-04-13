@@ -7,8 +7,8 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import {
     Button,
-    CircularProgress, Pagination, PaginationItem,
-    Paper,
+    CircularProgress, FormControl, Grid, InputLabel, MenuItem, Pagination, PaginationItem,
+    Paper, Select,
     Table,
     TableBody,
     TableCell,
@@ -26,7 +26,11 @@ export const Home = () => {
         errorMessage,
         calculationList,
         logout,
-        onChange
+        onChange,
+        operationList,
+        onChangeOperation,
+        operationType,
+        onFilterClick
     } = useHome();
 
     return (
@@ -55,6 +59,31 @@ export const Home = () => {
 
                     {!loading && errorMessage === "" && (
                         <>
+                            <Grid container spacing={2}>
+                                <Grid item xs={6}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Operation Type</InputLabel>
+                                        <Select
+                                            labelId="operation-type-label"
+                                            id="operation-type-label"
+                                            value={operationType}
+                                            label="Operation Type"
+                                            onChange={onChangeOperation}
+                                        >
+                                            <MenuItem value="">ALL</MenuItem>
+                                            {operationList.operations.map((item)=> (
+                                                <MenuItem value={item.operation_id}>{item.type}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={2}>
+                                <Grid item xs={6}>
+                                    <Button variant="contained" onClick={onFilterClick}>Apply Filters</Button>
+                                </Grid>
+                            </Grid>
+
                             <TableContainer component={Paper}>
                                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                     <TableHead>
