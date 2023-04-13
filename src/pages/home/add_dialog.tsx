@@ -13,6 +13,7 @@ import * as React from "react";
 import {useAddDialog} from "../../hooks/home/use_add_dialog";
 import Box from "@mui/material/Box";
 import {LoadingButton} from "@mui/lab";
+import Alert from "@mui/material/Alert";
 
 interface AddDialogProps{
     open: boolean;
@@ -33,7 +34,9 @@ export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
         valueOne,
         valueTwo,
         onChangeInput,
-        disableButton
+        disableButton,
+        onAddClick,
+        errorMessage
     } = useAddDialog(handleClose)
     return (
         <Dialog open={open} onClose={handleClose} fullWidth={true}>
@@ -88,12 +91,18 @@ export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
                 <Button onClick={onClose}>Cancel</Button>
                 <LoadingButton
                     loading={loading}
-                    onClick={onClose}
+                    onClick={onAddClick}
                     disabled={disableButton}
                 >
                     Add
                 </LoadingButton>
             </DialogActions>
+
+            {errorMessage !== "" && (
+                <Alert variant="filled" severity="error">
+                    {errorMessage}
+                </Alert>
+            )}
         </Dialog>
     )
 }

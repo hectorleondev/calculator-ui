@@ -1,5 +1,7 @@
 import {ChangeEvent, FormEvent, useCallback, useEffect, useState} from "react";
 import {SelectChangeEvent} from "@mui/material";
+import CalculationService from "../../api/calculation";
+import {string} from "zod";
 
 export const useAddDialog = (handleClose: ()=>void) => {
     const [operationType, setOperationType] = useState('0');
@@ -11,6 +13,7 @@ export const useAddDialog = (handleClose: ()=>void) => {
     const [valueOne, setValueOne] = useState('')
     const [valueTwo, setValueTwo] = useState('')
     const [disableButton, setDisableButton] = useState(true);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         setUpForm('');
@@ -33,6 +36,7 @@ export const useAddDialog = (handleClose: ()=>void) => {
         handleClose()
         setLoading(false);
         setDisableButton(true);
+        setErrorMessage('');
     }, []);
 
     const setUpForm = (value: string) => {
@@ -103,6 +107,47 @@ export const useAddDialog = (handleClose: ()=>void) => {
             setDisableButton(true);
         }
     }, [valueOne, valueTwo, operationType]);
+
+    const onAddClick = useCallback(() => {
+        const items = operationType.split(";");
+        let request_form: any = {
+            "operation_id": items[0]
+        };
+        if(items[1] === "addition"){
+            request_form["addend_one"] = parseFloat(valueOne);
+            request_form["addend_two"] = parseFloat(valueTwo);
+        }
+        if(items[1] === "subtraction"){
+            request_form["minuend"] = parseFloat(valueOne);
+            request_form["subtrahend"] = parseFloat(valueTwo);
+        }
+        if(items[1] === "multiplication"){
+            request_form["multiplicand"] = parseFloat(valueOne);
+            request_form["multiplier"] = parseFloat(valueTwo);
+        }
+        if(items[1] === "division"){
+            request_form["dividend"] = parseFloat(valueOne);
+            request_form["divisor"] = parseFloat(valueTwo);
+        }
+        if(items[1] === "square_root"){
+            request_form["radicand"] = parseFloat(valueOne);
+        }
+        if(items[1] === "random_string"){
+            request_form["length_string"] = parseFloat(valueOne);
+        }
+        setLoading(true);
+        const token: string | null = localStorage.getItem("auth_token")
+        CalculationService.save_calculation(token || '', request_form)
+            .then((res) => {
+                onClose();
+            })
+            .catch((e: any) => {
+                setErrorMessage(e.response.data.message);
+            })
+            .finally(()=>setLoading(false))
+
+    }, [valueOne, valueTwo,operationType]);
+
     return  {
         operationType,
         onChangeOperation,
@@ -115,6 +160,8 @@ export const useAddDialog = (handleClose: ()=>void) => {
         valueOne,
         valueTwo,
         onChangeInput,
-        disableButton
+        disableButton,
+        onAddClick,
+        errorMessage
     }
 }
