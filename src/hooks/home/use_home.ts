@@ -6,6 +6,8 @@ import {OperationList} from "../../api/operation/types";
 import {object, string, number, TypeOf} from "zod";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
+import {ConditionItems} from "./types";
+import {SelectChangeEvent} from "@mui/material";
 
 export const useHome = () => {
     const [loading, setLoading] = useState(false);
@@ -22,14 +24,28 @@ export const useHome = () => {
         operations: []
     })
 
+    const conditionAmountItem: ConditionItems[] = [
+        {value: "eq", name: "Equal"},
+        {value: "gt", name: "Greater"},
+        {value: "ge", name: "Greater Equal"},
+        {value: "lt", name: "Less"},
+        {value: "le", name: "Less Equal"},
+    ]
+
+    const conditionStringItem: ConditionItems[] = [
+        {value: "eq", name: "Equal"},
+        {value: "startswith", name: "Starts With"}
+    ]
+
     const [page, setPage] = useState(1)
     const [filters, setFilters] = useState("")
 
+    const [operationType, setOperationType] = useState("")
+    const [conditionAmount, setConditionAmount] = useState("eq")
+    const [conditionUseBalance, setConditionUseBalance] = useState("eq")
+    const [conditionOperationResponse, setConditionOperationResponse] = useState("eq")
+
     const filterSchema = object({
-        operation_type: string().default(""),
-        condition_amount: string().default("eq"),
-        condition_user_balance: string().default("eq"),
-        condition_operation_response: string().default("eq"),
         amount: number().optional(),
         user_balance: number().optional(),
         operation_response: string(),
@@ -90,26 +106,26 @@ export const useHome = () => {
 
     const onSubmitHandler: SubmitHandler<FilterInput> = (values) => {
         let filters = "";
-        if(values.operation_type !== ""){
-            filters = filters + "operation_id,eq,"+values.operation_type
+        if(operationType !== ""){
+            filters = filters + "operation_id,eq,"+operationType
         }
         if(values.amount !== undefined){
             if(filters !== ""){
                 filters = filters + "**"
             }
-            filters = filters + "amount,"+values.condition_amount+","+values.amount
+            filters = filters + "amount,"+conditionAmount+","+values.amount
         }
         if(values.user_balance !== undefined){
             if(filters !== ""){
                 filters = filters + "**"
             }
-            filters = filters + "user_balance,"+values.condition_user_balance+","+values.user_balance
+            filters = filters + "user_balance,"+conditionUseBalance+","+values.user_balance
         }
         if(values.operation_response !== ""){
             if(filters !== ""){
                 filters = filters + "**"
             }
-            filters = filters + "operation_response,"+values.condition_operation_response+","+values.operation_response
+            filters = filters + "operation_response,"+conditionOperationResponse+","+values.operation_response
         }
         console.log(filters);
         setFilters(filters);
@@ -128,6 +144,22 @@ export const useHome = () => {
             });
     };
 
+    const onChangeOperation = useCallback((event: SelectChangeEvent) => {
+        setOperationType(event.target.value);
+    }, []);
+
+    const onChangeAmount = useCallback((event: SelectChangeEvent) => {
+        setConditionAmount(event.target.value);
+    }, []);
+
+    const onChangeUseBalance = useCallback((event: SelectChangeEvent) => {
+        setConditionUseBalance(event.target.value);
+    }, []);
+
+    const onChangeOperationResponse = useCallback((event: SelectChangeEvent) => {
+        setConditionOperationResponse(event.target.value);
+    }, []);
+
     return {
         loading,
         errorMessage,
@@ -140,5 +172,15 @@ export const useHome = () => {
         register,
         errors,
         handleSubmit,
+        conditions_number: conditionAmountItem,
+        condition_string: conditionStringItem,
+        onChangeOperation,
+        onChangeAmount,
+        onChangeUseBalance,
+        onChangeOperationResponse,
+        operationType,
+        conditionAmount,
+        conditionUseBalance,
+        conditionOperationResponse
     }
 }

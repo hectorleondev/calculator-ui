@@ -33,6 +33,16 @@ export const Home = () => {
         register,
         errors,
         handleSubmit,
+        conditions_number,
+        condition_string,
+        onChangeOperation,
+        onChangeAmount,
+        onChangeUseBalance,
+        onChangeOperationResponse,
+        operationType,
+        conditionAmount,
+        conditionUseBalance,
+        conditionOperationResponse
     } = useHome();
 
     return (
@@ -75,8 +85,8 @@ export const Home = () => {
                                                     labelId="operation-type-label"
                                                     id="operation-type-label"
                                                     label="Operation Type"
-                                                    defaultValue=""
-                                                    {...register('operation_type')}
+                                                    value={operationType}
+                                                    onChange={onChangeOperation}
                                                 >
                                                     <MenuItem value="">ALL</MenuItem>
                                                     {operationList.operations.map((item)=> (
@@ -103,14 +113,12 @@ export const Home = () => {
                                                     labelId="condition-amount-label"
                                                     id="condition-amount-label"
                                                     label="Condition"
-                                                    defaultValue="eq"
-                                                    {...register('condition_amount')}
+                                                    value={conditionAmount}
+                                                    onChange={onChangeAmount}
                                                 >
-                                                    <MenuItem value="eq">Equal</MenuItem>
-                                                    <MenuItem value="gt">Greater</MenuItem>
-                                                    <MenuItem value="ge">Greater Igual</MenuItem>
-                                                    <MenuItem value="lt">Less</MenuItem>
-                                                    <MenuItem value="le">Less Equal</MenuItem>
+                                                    {conditions_number.map((item)=> (
+                                                        <MenuItem value={item.value}>{item.name}</MenuItem>
+                                                    ))}
                                                 </Select>
                                             </FormControl>
                                         </Grid>
@@ -134,14 +142,12 @@ export const Home = () => {
                                                     labelId="condition-user-balance-label"
                                                     id="condition-user-balance-label"
                                                     label="Condition"
-                                                    defaultValue="eq"
-                                                    {...register('condition_user_balance')}
+                                                    value={conditionUseBalance}
+                                                    onChange={onChangeUseBalance}
                                                 >
-                                                    <MenuItem value="eq">Equal</MenuItem>
-                                                    <MenuItem value="gt">Greater</MenuItem>
-                                                    <MenuItem value="ge">Greater Igual</MenuItem>
-                                                    <MenuItem value="lt">Less</MenuItem>
-                                                    <MenuItem value="le">Less Equal</MenuItem>
+                                                    {conditions_number.map((item)=> (
+                                                        <MenuItem value={item.value}>{item.name}</MenuItem>
+                                                    ))}
                                                 </Select>
                                             </FormControl>
                                         </Grid>
@@ -160,11 +166,12 @@ export const Home = () => {
                                                     labelId="condition-operation-response-label"
                                                     id="condition-operation-response-label"
                                                     label="Condition"
-                                                    defaultValue="eq"
-                                                    {...register('condition_operation_response')}
+                                                    value={conditionOperationResponse}
+                                                    onChange={onChangeOperationResponse}
                                                 >
-                                                    <MenuItem value="eq">Equal</MenuItem>
-                                                    <MenuItem value="startswith">Starts With</MenuItem>
+                                                    {condition_string.map((item)=> (
+                                                        <MenuItem value={item.value}>{item.name}</MenuItem>
+                                                    ))}
                                                 </Select>
                                             </FormControl>
                                         </Grid>
