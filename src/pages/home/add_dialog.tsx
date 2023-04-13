@@ -29,7 +29,11 @@ export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
         labelOne,
         labelTwo,
         onClose,
-        loading
+        loading,
+        valueOne,
+        valueTwo,
+        onChangeInput,
+        disableButton
     } = useAddDialog(handleClose)
     return (
         <Dialog open={open} onClose={handleClose} fullWidth={true}>
@@ -48,7 +52,7 @@ export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
                             value={operationType}
                             onChange={onChangeOperation}
                         >
-                            <MenuItem value="">ALL</MenuItem>
+                            <MenuItem value="0"></MenuItem>
                             {operations.map((item)=> (
                                 <MenuItem value={item.operation_id+";"+item.type}>{item.type}</MenuItem>
                             ))}
@@ -62,6 +66,8 @@ export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
                             label={labelOne}
                             fullWidth
                             variant="outlined"
+                            value={valueOne}
+                            onChange={(e)=>onChangeInput(e, "value_one")}
                         />
                     )}
                     {!hiddenInputTwo && (
@@ -72,6 +78,8 @@ export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
                             label={labelTwo}
                             fullWidth
                             variant="outlined"
+                            value={valueTwo}
+                            onChange={(e)=>onChangeInput(e, "value_two")}
                         />
                     )}
                 </Box>
@@ -81,6 +89,7 @@ export const AddDialog = ({open, handleClose, operations}:AddDialogProps) => {
                 <LoadingButton
                     loading={loading}
                     onClick={onClose}
+                    disabled={disableButton}
                 >
                     Add
                 </LoadingButton>
