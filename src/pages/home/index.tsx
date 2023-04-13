@@ -17,6 +17,7 @@ import {
     TableRow
 } from "@mui/material";
 import Alert from "@mui/material/Alert";
+import TextField from "@mui/material/TextField";
 
 const theme = createTheme();
 export const Home = () => {
@@ -59,7 +60,7 @@ export const Home = () => {
 
                     {!loading && errorMessage === "" && (
                         <>
-                            <Grid container spacing={2}>
+                            <Grid container spacing={4}>
                                 <Grid item xs={6}>
                                     <FormControl fullWidth>
                                         <InputLabel id="demo-simple-select-label">Operation Type</InputLabel>
@@ -77,8 +78,75 @@ export const Home = () => {
                                         </Select>
                                     </FormControl>
                                 </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        type="number"
+                                        id="outlined-basic"
+                                        label="Amount"
+                                        variant="outlined"
+                                    />
+                                    <FormControl>
+                                        <InputLabel id="demo-simple-select-label">Condition</InputLabel>
+                                        <Select
+                                            labelId="condition-label"
+                                            id="condition-label"
+                                            value="eq"
+                                            label="Condition"
+                                        >
+                                            <MenuItem value="eq">EQ</MenuItem>
+                                            <MenuItem value="gt">GT</MenuItem>
+                                            <MenuItem value="ge">GE</MenuItem>
+                                            <MenuItem value="lt">LT</MenuItem>
+                                            <MenuItem value="le">LE</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
                             </Grid>
-                            <Grid container spacing={2}>
+                            <Grid container spacing={4} sx={{marginTop: "10px"}}>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        type="number"
+                                        id="outlined-basic"
+                                        label="User Balance"
+                                        variant="outlined"
+                                    />
+                                    <FormControl>
+                                        <InputLabel id="demo-simple-select-label">Condition</InputLabel>
+                                        <Select
+                                            labelId="condition-label"
+                                            id="condition-label"
+                                            value="eq"
+                                            label="Condition"
+                                        >
+                                            <MenuItem value="eq">EQ</MenuItem>
+                                            <MenuItem value="gt">GT</MenuItem>
+                                            <MenuItem value="ge">GE</MenuItem>
+                                            <MenuItem value="lt">LT</MenuItem>
+                                            <MenuItem value="le">LE</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="Operacion Response"
+                                        variant="outlined"
+                                    />
+                                    <FormControl>
+                                        <InputLabel id="demo-simple-select-label">Condition</InputLabel>
+                                        <Select
+                                            labelId="condition-label"
+                                            id="condition-label"
+                                            value="eq"
+                                            label="Condition"
+                                        >
+                                            <MenuItem value="eq">EQ</MenuItem>
+                                            <MenuItem value="startswith">STARTS</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={2} sx={{marginTop: "10px", marginBottom: "10px"}}>
                                 <Grid item xs={6}>
                                     <Button variant="contained" onClick={onFilterClick}>Apply Filters</Button>
                                 </Grid>
