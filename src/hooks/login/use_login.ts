@@ -30,7 +30,6 @@ export const useLogin = () => {
         if (isSubmitSuccessful) {
             reset();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isSubmitSuccessful]);
 
     const onSubmitHandler: SubmitHandler<RegisterInput> = (values) => {

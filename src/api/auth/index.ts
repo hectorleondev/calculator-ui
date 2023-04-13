@@ -9,10 +9,6 @@ class AuthService {
             })
     }
 
-    logout() {
-        localStorage.removeItem("auth_token");
-    }
-
     getUser(token: string) {
         return http.get<User>('user', {headers: { Authorization: 'Bearer ' + token }})
     }
