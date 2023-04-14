@@ -1,10 +1,5 @@
 service: calculator-ui
 custom:
-  defaultStage: dev
-  stages:
-    - api
-    - dev
-    - test
   S3_BUCKET_NAME:
     Ref: StaticFilesS3Bucket
   CHECKAPIGW: false
@@ -21,15 +16,12 @@ package:
 
 plugins:
   - serverless-scriptable-plugin
-  - serverless-stage-manager
 
 provider:
   name: aws
   runtime: python3.9
   region: us-east-1
-  stage: ${opt:stage, ${self:custom.defaultStage}}
-  stackTags:
-    "sc:service:name": ${self:service}
+  stage: dev
 
 resources:
   Resources:
