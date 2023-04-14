@@ -1,27 +1,24 @@
 service: calculator-ui
-custom:
-  S3_BUCKET_NAME:
-    Ref: StaticFilesS3Bucket
-  CHECKAPIGW: false
-  scriptable:
-    hooks:
-      before:package:createDeploymentArtifacts:
-        - yarn install
-        - yarn build
-
-package:
-  exclude:
-    - node_modules/**
-    - .serverless/**
-
-plugins:
-  - serverless-scriptable-plugin
 
 provider:
   name: aws
   runtime: python3.9
   region: us-east-1
   stage: dev
+plugins:
+  - serverless-scriptable-plugin
+  - serverless-s3-sync
+
+custom:
+  S3_BUCKET_NAME: calculator-site-react-app
+  scriptable:
+    hooks:
+      before:package:createDeploymentArtifacts:
+        - yarn install
+        - yarn build
+  s3Sync:
+    - bucketName: ${self:custom.S3_BUCKET_NAME}
+      localDir: build/
 
 resources:
   Resources:
@@ -42,6 +39,7 @@ resources:
     StaticFilesS3Bucket:
       Type: AWS::S3::Bucket
       Properties:
+        BucketName: ${self:custom.S3_BUCKET_NAME}
         Tags:
           - Key: "sc:security:exceptions"
             Value: "block_public_access"
@@ -92,7 +90,7 @@ resources:
                     - - "arn:aws:s3:::"
                       - Ref: StaticFilesS3Bucket
                       - /*
-                - Fn::GetAtt: [StaticFilesS3Bucket, Arn]
+                - Fn::GetAtt: [ StaticFilesS3Bucket, Arn ]
               Condition:
                 Bool:
                   aws:SecureTransport:
@@ -106,8 +104,55 @@ resources:
                 Fn::Join:
                   [
                     "",
-                    ["arn:aws:s3:::", { "Ref": "StaticFilesS3Bucket" }, "/*"],
+                    [ "arn:aws:s3:::", { "Ref": "StaticFilesS3Bucket" }, "/*" ],
                   ]
+
+    CloudFrontOriginIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: 'Origin identity'
+
+    CloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      DependsOn:
+        - StaticFilesS3Bucket
+      Properties:
+        DistributionConfig:
+          Origins:
+            - ConnectionAttempts: 3
+              ConnectionTimeout: 10
+              DomainName:
+                Fn::GetAtt:
+                  - StaticFilesS3Bucket
+                  - RegionalDomainName
+              Id:
+                Ref: StaticFilesS3Bucket
+              S3OriginConfig: { }
+          Enabled: 'true'
+          DefaultRootObject: index.html
+          CustomErrorResponses:
+            - ErrorCode: 404
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+          DefaultCacheBehavior:
+            AllowedMethods:
+              - DELETE
+              - GET
+              - HEAD
+              - OPTIONS
+              - PATCH
+              - POST
+              - PUT
+            TargetOriginId:
+              Ref: StaticFilesS3Bucket
+            ForwardedValues:
+              QueryString: 'false'
+              Cookies:
+                Forward: none
+            ViewerProtocolPolicy: redirect-to-https
+          ViewerCertificate:
+            CloudFrontDefaultCertificate: true
 
   Outputs:
     StaticFilesS3BucketName:
