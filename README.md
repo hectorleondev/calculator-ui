@@ -3,8 +3,9 @@
 This template includes samples how to install the UI.
 
 
-## Environment Information
-Domain: https://o01xgqczze.execute-api.us-east-1.amazonaws.com
+## On Live
+URL: https://calculator-site-react-app.s3.us-east-1.amazonaws.com/index.html
+
 Credentials
 ```
 {
