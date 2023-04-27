@@ -13,7 +13,12 @@ import Alert from '@mui/material/Alert';
 import {Navigate} from "react-router-dom";
 
 const theme = createTheme();
-export const Login = () => {
+
+interface LoginProps {
+    setAuthToken :(token: string) => void
+}
+
+export const Login = ({setAuthToken}: LoginProps) => {
     const {
         onSubmitHandler,
         register,
@@ -21,14 +26,10 @@ export const Login = () => {
         loading,
         handleSubmit,
         errorMessage,
-        token
-    } = useLogin()
+    } = useLogin(setAuthToken)
 
     return (
         <ThemeProvider theme={theme}>
-            {token && (
-                <Navigate to="/" replace />
-            )}
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <Box

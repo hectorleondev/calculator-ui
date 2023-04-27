@@ -21,9 +21,12 @@ import TextField from "@mui/material/TextField";
 import {AddDialog} from "./add_dialog";
 
 const theme = createTheme();
-export const Home = () => {
+interface HomeProps {
+    setAuthToken :(token: string) => void
+}
+
+export const Home = ({setAuthToken}: HomeProps) => {
     const {
-        token,
         loading,
         errorMessage,
         calculationList,
@@ -48,14 +51,11 @@ export const Home = () => {
         handleClickOpenAddDialog,
         handleCloseAddDialog,
         onAfterAdd
-    } = useHome();
+    } = useHome(setAuthToken);
 
     return (
         <ThemeProvider theme={theme}>
             <Button variant="text" onClick={logout}>Logout</Button>
-            {!token && (
-                <Navigate to="/login" replace />
-            )}
             <Container component="main" maxWidth="lg">
                 <CssBaseline />
                 <Box

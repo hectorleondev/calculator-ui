@@ -1,21 +1,24 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import {Home} from './pages/home'
+import React, {useEffect, useState} from 'react';
 import {Login} from './pages/login'
+import {Home} from "./pages/home";
 function App() {
+  const [authToken, setAuthToken] = useState('');
+  useEffect(() => {
+    const token: string | null = localStorage.getItem("auth_token")
+    if(token !== null){
+      setAuthToken(token)
+    }
+  }, []);
+
   return (
-      <Routes>
-          <Route path='/' element={<Home/>} />
-          <Route path='/login' element={<Login/>} />
-          <Route
-              path="*"
-              element={
-                  <div>
-                      <h2>404 Page not found</h2>
-                  </div>
-              }
-          />
-      </Routes>
+      <>
+        {authToken === ""  && (
+          <Login setAuthToken={setAuthToken}/>
+        )}
+        {authToken !== ""  && (
+            <Home setAuthToken={setAuthToken}/>
+        )}
+      </>
   );
 }
 

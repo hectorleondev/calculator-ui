@@ -40,9 +40,6 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.S3_BUCKET_NAME}
-        Tags:
-          - Key: "sc:security:exceptions"
-            Value: "block_public_access"
         PublicAccessBlockConfiguration:
           BlockPublicAcls: "false"
           BlockPublicPolicy: "false"
@@ -119,6 +116,7 @@ resources:
         - StaticFilesS3Bucket
       Properties:
         DistributionConfig:
+          HttpVersion: http2
           Origins:
             - ConnectionAttempts: 3
               ConnectionTimeout: 10
@@ -130,14 +128,21 @@ resources:
                 Ref: StaticFilesS3Bucket
               S3OriginConfig:
                 OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
-              OriginPath: /my-content
           Enabled: 'true'
           DefaultRootObject: index.html
           CustomErrorResponses:
             - ErrorCode: 404
               ResponseCode: 200
               ResponsePagePath: /index.html
-          CacheBehaviors: []
+          CacheBehaviors:
+            - PathPattern: /
+              TargetOriginId:
+                Ref: StaticFilesS3Bucket
+              ViewerProtocolPolicy: redirect-to-https
+              ForwardedValues:
+                QueryString: 'false'
+                Cookies:
+                  Forward: none
           DefaultCacheBehavior:
             AllowedMethods:
               - DELETE
@@ -147,6 +152,8 @@ resources:
               - PATCH
               - POST
               - PUT
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            Compress: true
             TargetOriginId:
               Ref: StaticFilesS3Bucket
             ForwardedValues:

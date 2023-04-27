@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import AuthService from "../../api/auth";
 
-export const useLogin = () => {
+export const useLogin = (setAuthToken :(token: string) => void) => {
     const registerSchema = object({
         email: string().nonempty('Email is required').email('Email is invalid'),
         password: string()
@@ -39,7 +39,7 @@ export const useLogin = () => {
             .then((response: any) => {
                 const token = response.data.token;
                 localStorage.setItem("auth_token", token);
-                window.location.href = "/";
+                setAuthToken(token)
             }).catch((e: any) => {
                 setErrorMessage(e.response.data.message);
             }).finally(()=> {
@@ -55,7 +55,6 @@ export const useLogin = () => {
         handleSubmit,
         errorMessage,
         setErrorMessage,
-        setLoading,
-        token: localStorage.getItem("auth_token")
+        setLoading
     }
 }

@@ -9,7 +9,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {ConditionItems} from "./types";
 import {SelectChangeEvent} from "@mui/material";
 
-export const useHome = () => {
+export const useHome = (setAuthToken :(token: string) => void) => {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [calculationList, setCalculationList] = useState<CalculationList>({
@@ -120,7 +120,7 @@ export const useHome = () => {
 
     const logout =() => {
         localStorage.removeItem("auth_token");
-        window.location.href = "/login";
+        setAuthToken('');
     }
 
     const onSubmitHandler: SubmitHandler<FilterInput> = (values) => {
@@ -190,7 +190,6 @@ export const useHome = () => {
     return {
         loading,
         errorMessage,
-        token: localStorage.getItem("auth_token"),
         calculationList,
         logout,
         onChange,
